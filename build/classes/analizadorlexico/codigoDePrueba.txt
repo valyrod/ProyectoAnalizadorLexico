@@ -1,0 +1,53 @@
+
+
+    private void btnAnalizarMouseReleased(java.awt.event.MouseEvent evt) {                                          
+        try {
+            Path archivoTemporal = Files.createTempFile(null, null);
+            Files.write(archivoTemporal, txtEntrada.getText().getBytes(StandardCharsets.UTF_8));
+            
+
+            try {
+               Reader lector = new BufferedReader(new FileReader(archivoTemporal.toString()));
+               ReglasLexicas ctrlLex = new ReglasLexicas(              );
+               String resultado = "";
+
+               int contadorVar = 0; 
+               int contadorPal = 0;
+
+               while (true) {
+                   Tokens tokens = ctrlLex.yylex();
+                   if (tokens == null) {
+                       resultado += "FIN";
+                       resultado += "\nEl número de variables encontradas es: " + contadorVar;
+                       resultado += "\nEl número de palabras reservadas encontradas es: " + contadorPal;
+                       txtSalida.setText(resultado);                       
+                       break;
+                   }
+                   switch (tokens) {
+                       case ERROR: 
+                           break;
+                       case Variable: 
+                           contadorVar++;
+                           resultado += ctrlLex.lexema + ": Es una " + tokens + "\n";
+                           break;
+                       case Numero:
+                           resultado += ctrlLex.lexema + ": Es un " + tokens + "\n";
+                           break;
+                       case PalabraReservada:
+                           contadorPal++;
+                           resultado += ctrlLex.lexema + ": Es una palabra " + tokens + "\n";
+                           break; 
+                       default:
+                           resultado += "Token: " + ctrlLex.lexema + " - " + tokens + "\n";
+                           break;
+                   }
+               }
+           } catch (FileNotFoundException ex) {
+              ex.printStackTrace();
+           } catch (IOException ex) {
+               ex.printStackTrace();
+           }
+
+        } catch (IOException ex) {
+            Logger.getLogger(PantallaPrincipal.class.getName()).log(Level.SEVERE, null, ex);
+        }
